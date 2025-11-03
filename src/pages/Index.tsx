@@ -1,8 +1,21 @@
 import { ShoppingBag, TrendingUp, Users, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 const Index = () => {
+  const { user, userRole, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect authenticated users to their dashboard
+    if (!loading && user && userRole) {
+      if (userRole === 'admin') navigate('/admin/dashboard');
+      else if (userRole === 'supplier') navigate('/supplier/dashboard');
+      else if (userRole === 'customer') navigate('/customer/dashboard');
+    }
+  }, [user, userRole, loading, navigate]);
   const features = [
     {
       icon: ShoppingBag,
@@ -39,7 +52,21 @@ const Index = () => {
               <Link to="/products">
                 <Button variant="outline">Browse Products</Button>
               </Link>
-              <Button>Get Started</Button>
+              {!user ? (
+                <Button asChild>
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+              ) : (
+                <Button asChild>
+                  <Link to={
+                    userRole === 'admin' ? '/admin/dashboard' :
+                    userRole === 'supplier' ? '/supplier/dashboard' :
+                    '/customer/dashboard'
+                  }>
+                    Dashboard
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -64,8 +91,8 @@ const Index = () => {
                   Start Shopping
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="text-lg px-8">
-                Become a Supplier
+              <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+                <Link to="/auth">Become a Supplier</Link>
               </Button>
             </div>
           </div>
@@ -107,8 +134,8 @@ const Index = () => {
           <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
             Join thousands of satisfied customers and suppliers on Kenya's fastest-growing marketplace
           </p>
-          <Button size="lg" variant="secondary" className="text-lg px-8">
-            Create Your Account
+          <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+            <Link to="/auth">Create Your Account</Link>
           </Button>
         </div>
       </section>

@@ -1,8 +1,11 @@
 import { Users, ShoppingBag, TrendingUp, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminDashboard = () => {
+  const { signOut } = useAuth();
   const stats = [
     { title: "Total Users", value: "1,234", icon: Users, change: "+12%" },
     { title: "Total Orders", value: "856", icon: ShoppingBag, change: "+8%" },
@@ -14,7 +17,10 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card shadow-sm">
         <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <Button onClick={signOut} variant="outline">Sign Out</Button>
+          </div>
         </div>
       </header>
 

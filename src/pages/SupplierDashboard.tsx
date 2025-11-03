@@ -1,8 +1,10 @@
 import { Package, Plus, TrendingUp, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
 
 const SupplierDashboard = () => {
+  const { signOut } = useAuth();
   const stats = [
     { title: "Total Products", value: "24", icon: Package, color: "text-primary" },
     { title: "Total Sales", value: "KSh 145,000", icon: DollarSign, color: "text-secondary" },
@@ -15,10 +17,13 @@ const SupplierDashboard = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Supplier Dashboard</h1>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Product
-            </Button>
+            <div className="flex gap-2">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Product
+              </Button>
+              <Button onClick={signOut} variant="outline">Sign Out</Button>
+            </div>
           </div>
         </div>
       </header>
