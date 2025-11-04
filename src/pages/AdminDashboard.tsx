@@ -1,16 +1,67 @@
+import { useEffect, useState } from "react";
 import { Users, ShoppingBag, TrendingUp, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { KYCApprovals } from "@/components/admin/KYCApprovals";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
-  const stats = [
-    { title: "Total Users", value: "1,234", icon: Users, change: "+12%" },
-    { title: "Total Orders", value: "856", icon: ShoppingBag, change: "+8%" },
-    { title: "Revenue", value: "KSh 2.4M", icon: TrendingUp, change: "+23%" },
-    { title: "Active Suppliers", value: "127", icon: Activity, change: "+5%" },
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalOrders: 0,
+    revenue: 0,
+    activeSuppliers: 0,
+  });
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      // Fetch total users (from profiles)
+      const { count: usersCount } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true });
+
+      // Fetch total orders
+      const { count: ordersCount } = await supabase
+        .from("orders")
+        .select("*", { count: "exact", head: true });
+
+      // Fetch revenue
+      const { data: ordersData } = await supabase
+        .from("orders")
+        .select("total_price")
+        .eq("status", "completed");
+
+      const revenue = ordersData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
+
+      // Fetch active suppliers
+      const { count: suppliersCount } = await supabase
+        .from("suppliers")
+        .select("*", { count: "exact", head: true })
+        .eq("kyc_status", "approved");
+
+      setStats({
+        totalUsers: usersCount || 0,
+        totalOrders: ordersCount || 0,
+        revenue,
+        activeSuppliers: suppliersCount || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
+
+  const displayStats = [
+    { title: "Total Users", value: stats.totalUsers.toString(), icon: Users },
+    { title: "Total Orders", value: stats.totalOrders.toString(), icon: ShoppingBag },
+    { title: "Revenue", value: `KSh ${stats.revenue.toFixed(2)}`, icon: TrendingUp },
+    { title: "Active Suppliers", value: stats.activeSuppliers.toString(), icon: Activity },
   ];
 
   return (
@@ -26,7 +77,7 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat) => (
+          {displayStats.map((stat) => (
             <Card key={stat.title}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -36,20 +87,41 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">{stat.value}</div>
-                <p className="text-sm text-secondary font-medium mt-1">
-                  {stat.change} from last month
-                </p>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <Tabs defaultValue="users" className="space-y-6">
+        <Tabs defaultValue="kyc" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="products">Products</TabsTrigger>
+            <TabsTrigger value="kyc">KYC Approvals</TabsTrigger>
+            <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
+            <TabsTrigger value="users">All Users</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="kyc">
+            <Card>
+              <CardHeader>
+                <CardTitle>KYC Approval Requests</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <KYCApprovals />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="suppliers">
+            <Card>
+              <CardHeader>
+                <CardTitle>All Suppliers</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Complete supplier directory will be displayed here.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="users">
             <Card>
@@ -58,33 +130,7 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  User management interface will be displayed here.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="orders">
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Order management interface will be displayed here.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="products">
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Product management interface will be displayed here.
+                  Complete user directory and role management will be displayed here.
                 </p>
               </CardContent>
             </Card>
