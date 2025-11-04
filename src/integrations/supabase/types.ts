@@ -14,6 +14,91 @@ export type Database = {
   }
   public: {
     Tables: {
+      orders: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          product_id: string
+          quantity: number
+          status: string
+          total_price: number
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          product_id: string
+          quantity: number
+          status?: string
+          total_price: number
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          status?: string
+          total_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          stock: number
+          supplier_id: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          stock?: number
+          supplier_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          stock?: number
+          supplier_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -41,6 +126,42 @@ export type Database = {
           id?: string
           phone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          business_certificate_url: string | null
+          business_name: string
+          created_at: string
+          id: string
+          id_document_url: string | null
+          kyc_status: string
+          rejection_reason: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_certificate_url?: string | null
+          business_name: string
+          created_at?: string
+          id?: string
+          id_document_url?: string | null
+          kyc_status?: string
+          rejection_reason?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_certificate_url?: string | null
+          business_name?: string
+          created_at?: string
+          id?: string
+          id_document_url?: string | null
+          kyc_status?: string
+          rejection_reason?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
