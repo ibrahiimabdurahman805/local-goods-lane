@@ -4,10 +4,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { CartProvider } from "@/hooks/useCart";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
 import SupplierDashboard from "./pages/SupplierDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
@@ -22,37 +25,41 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/products" element={<Products />} />
-            <Route 
-              path="/customer/dashboard" 
-              element={
-                <ProtectedRoute allowedRoles={['customer']}>
-                  <CustomerDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/supplier/dashboard" 
-              element={
-                <ProtectedRoute allowedRoles={['supplier']}>
-                  <SupplierDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin/dashboard" 
-              element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <CartProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route 
+                path="/customer/dashboard" 
+                element={
+                  <ProtectedRoute allowedRoles={['customer']}>
+                    <CustomerDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/supplier/dashboard" 
+                element={
+                  <ProtectedRoute allowedRoles={['supplier']}>
+                    <SupplierDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/dashboard" 
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </CartProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
