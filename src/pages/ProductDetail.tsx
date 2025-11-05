@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Header } from "@/components/layout/Header";
 import { useCart } from "@/hooks/useCart";
 import { ArrowLeft, ShoppingCart, Building2 } from "lucide-react";
 import { toast } from "sonner";
@@ -68,26 +69,7 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card shadow-sm sticky top-0 z-10 backdrop-blur-sm bg-card/80">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              MarketHub
-            </Link>
-            <div className="flex gap-3">
-              <Button variant="outline" asChild>
-                <Link to="/products">Browse Products</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/cart">
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Cart
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-4 py-8">
         <Button variant="ghost" asChild className="mb-6">

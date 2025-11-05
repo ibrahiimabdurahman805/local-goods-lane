@@ -6,25 +6,16 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
+import { Header } from "@/components/layout/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
 const Index = () => {
-  const { user, userRole, loading } = useAuth();
-  const { addToCart, totalItems } = useCart();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    // Redirect authenticated users to their dashboard
-    if (!loading && user && userRole) {
-      if (userRole === 'admin') navigate('/admin/dashboard');
-      else if (userRole === 'supplier') navigate('/supplier/dashboard');
-      else if (userRole === 'customer') navigate('/customer/dashboard');
-    }
-  }, [user, userRole, loading, navigate]);
 
   useEffect(() => {
     fetchFeaturedProducts();
@@ -84,46 +75,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card shadow-sm sticky top-0 z-10 backdrop-blur-sm bg-card/80">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              MarketHub
-            </div>
-            <div className="flex gap-3">
-              <Button variant="outline" asChild>
-                <Link to="/products">Browse Products</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/cart" className="relative">
-                  <ShoppingCart className="h-4 w-4" />
-                  {totalItems > 0 && (
-                    <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                      {totalItems}
-                    </Badge>
-                  )}
-                </Link>
-              </Button>
-              {!user ? (
-                <Button asChild>
-                  <Link to="/auth">Sign In</Link>
-                </Button>
-              ) : (
-                <Button asChild>
-                  <Link to={
-                    userRole === 'admin' ? '/admin/dashboard' :
-                    userRole === 'supplier' ? '/supplier/dashboard' :
-                    '/customer/dashboard'
-                  }>
-                    Dashboard
-                  </Link>
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-20 md:py-32">

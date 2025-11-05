@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Header } from "@/components/layout/Header";
 import { useCart } from "@/hooks/useCart";
 import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft } from "lucide-react";
 
@@ -11,18 +12,7 @@ export default function Cart() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
-        <header className="border-b bg-card shadow-sm sticky top-0 z-10 backdrop-blur-sm bg-card/80">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                MarketHub
-              </Link>
-              <Button variant="outline" asChild>
-                <Link to="/products">Browse Products</Link>
-              </Button>
-            </div>
-          </div>
-        </header>
+        <Header />
 
         <main className="container mx-auto px-4 py-16 text-center">
           <ShoppingCart className="h-24 w-24 mx-auto text-muted-foreground mb-6" />
@@ -40,18 +30,7 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card shadow-sm sticky top-0 z-10 backdrop-blur-sm bg-card/80">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              MarketHub
-            </Link>
-            <Button variant="outline" asChild>
-              <Link to="/products">Browse Products</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-4 py-8">
         <Button variant="ghost" asChild className="mb-6">

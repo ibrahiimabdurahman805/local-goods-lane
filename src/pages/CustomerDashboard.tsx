@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { Package, User, ShoppingBag } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ProductBrowser } from '@/components/customer/ProductBrowser';
 
 export default function CustomerDashboard() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,14 +49,13 @@ export default function CustomerDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Customer Dashboard</h1>
-          <Button onClick={signOut} variant="outline">Sign Out</Button>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Customer Dashboard</h1>
+          <p className="text-muted-foreground">Welcome back, {user?.email}</p>
+        </div>
         <div className="mb-8 grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
