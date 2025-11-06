@@ -14,11 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          price: number
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          price: number
+          product_id: string
+          quantity: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          price?: number
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string
           customer_id: string
+          delivery_address: string | null
+          delivery_city: string | null
+          delivery_notes: string | null
+          delivery_phone: string | null
           id: string
+          payment_intent_id: string | null
+          payment_status: string | null
           product_id: string
           quantity: number
           status: string
@@ -27,7 +75,13 @@ export type Database = {
         Insert: {
           created_at?: string
           customer_id: string
+          delivery_address?: string | null
+          delivery_city?: string | null
+          delivery_notes?: string | null
+          delivery_phone?: string | null
           id?: string
+          payment_intent_id?: string | null
+          payment_status?: string | null
           product_id: string
           quantity: number
           status?: string
@@ -36,7 +90,13 @@ export type Database = {
         Update: {
           created_at?: string
           customer_id?: string
+          delivery_address?: string | null
+          delivery_city?: string | null
+          delivery_notes?: string | null
+          delivery_phone?: string | null
           id?: string
+          payment_intent_id?: string | null
+          payment_status?: string | null
           product_id?: string
           quantity?: number
           status?: string

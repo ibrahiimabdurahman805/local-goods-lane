@@ -147,10 +147,10 @@ export default function Cart() {
               </CardContent>
               <CardFooter className="flex-col gap-2">
                 <Button className="w-full" size="lg" asChild>
-                  <Link to="/auth">Proceed to Checkout</Link>
+                  <Link to="/checkout">Proceed to Checkout</Link>
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  Sign in to complete your purchase
+                  Complete your delivery details and payment
                 </p>
               </CardFooter>
             </Card>
