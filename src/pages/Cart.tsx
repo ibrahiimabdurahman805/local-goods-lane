@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Header } from "@/components/layout/Header";
+import { AppNav } from "@/components/layout/AppNav";
 import { useCart } from "@/hooks/useCart";
 import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft } from "lucide-react";
 
@@ -12,15 +12,15 @@ export default function Cart() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <AppNav />
 
-        <main className="container mx-auto px-4 py-16 text-center">
+        <main className="container mx-auto px-4 py-16 text-center animate-fade-in">
           <ShoppingCart className="h-24 w-24 mx-auto text-muted-foreground mb-6" />
           <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
           <p className="text-muted-foreground mb-8">
             Add some products to your cart to get started
           </p>
-          <Button size="lg" asChild>
+          <Button size="lg" className="gradient-primary text-white shadow-glow hover-scale" asChild>
             <Link to="/products">Start Shopping</Link>
           </Button>
         </main>
@@ -30,7 +30,7 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <AppNav />
 
       <main className="container mx-auto px-4 py-8">
         <Button variant="ghost" asChild className="mb-6">

@@ -15,6 +15,7 @@ import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
 import PaymentProcessing from "./pages/PaymentProcessing";
+import Support from "./pages/Support";
 import SupplierDashboard from "./pages/SupplierDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
           <Route path="/payment-processing" element={<PaymentProcessing />} />
+          <Route path="/support" element={<Support />} />
               <Route 
                 path="/customer/dashboard" 
                 element={

@@ -21,7 +21,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
 
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+    <Card className="group overflow-hidden shadow-card hover-lift">
       <Link to={`/products/${product.id}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           {product.image_url ? (
@@ -36,7 +36,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             </div>
           )}
           {product.category && (
-            <Badge className="absolute top-2 left-2 bg-secondary">
+            <Badge className="absolute top-2 left-2 gradient-secondary text-white">
               {product.category}
             </Badge>
           )}
@@ -59,7 +59,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Button 
-          className="w-full" 
+          className="w-full gradient-primary text-white shadow-glow hover-scale" 
           size="lg"
           onClick={(e) => {
             e.preventDefault();

@@ -8,41 +8,48 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 220 13% 13%;
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 13%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 13%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 16 90% 58%;
+    --primary: 24 100% 50%;
     --primary-foreground: 0 0% 100%;
+    --primary-hover: 24 100% 45%;
 
-    --secondary: 186 57% 40%;
+    --secondary: 197 71% 48%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 13% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 16 90% 58%;
+    --accent: 24 100% 50%;
     --accent-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 16 90% 58%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 24 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
     
-    --gradient-primary: linear-gradient(135deg, hsl(16 90% 58%) 0%, hsl(16 95% 68%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(186 57% 40%) 0%, hsl(186 62% 50%) 100%);
-    --shadow-glow: 0 8px 32px hsl(16 90% 58% / 0.15);
-    --shadow-card: 0 2px 8px hsl(220 13% 13% / 0.08);
+    --gradient-primary: linear-gradient(135deg, hsl(24 100% 50%) 0%, hsl(32 100% 55%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(197 71% 48%) 0%, hsl(197 76% 58%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(24 100% 50%) 0%, hsl(32 98% 56%) 50%, hsl(38 92% 50%) 100%);
+    --shadow-glow: 0 10px 40px hsl(24 100% 50% / 0.2);
+    --shadow-card: 0 2px 8px hsl(222 47% 11% / 0.06);
+    --shadow-elevated: 0 8px 24px hsl(222 47% 11% / 0.12);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease-out;
 
     --sidebar-background: 0 0% 98%;
 
@@ -109,6 +116,36 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
   }
 }
