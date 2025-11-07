@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { KYCApprovals } from "@/components/admin/KYCApprovals";
+import { UserManagement } from "@/components/admin/UserManagement";
+import { OrdersManagement } from "@/components/admin/OrdersManagement";
+import { SuppliersManagement } from "@/components/admin/SuppliersManagement";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -92,33 +95,49 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        <Tabs defaultValue="kyc" className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="kyc">KYC Approvals</TabsTrigger>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
-            <TabsTrigger value="users">All Users</TabsTrigger>
+            <TabsTrigger value="kyc">KYC Approvals</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="kyc">
+          <TabsContent value="overview">
             <Card>
               <CardHeader>
-                <CardTitle>KYC Approval Requests</CardTitle>
+                <CardTitle>Platform Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <KYCApprovals />
+                <p className="text-muted-foreground mb-4">
+                  Quick summary of your platform's performance and key metrics.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="border rounded-lg p-4">
+                    <h3 className="font-semibold mb-2">Recent Activity</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Monitor real-time platform activity and user engagement.
+                    </p>
+                  </div>
+                  <div className="border rounded-lg p-4">
+                    <h3 className="font-semibold mb-2">Platform Health</h3>
+                    <p className="text-sm text-muted-foreground">
+                      All systems operational. No pending issues.
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="suppliers">
+          <TabsContent value="orders">
             <Card>
               <CardHeader>
-                <CardTitle>All Suppliers</CardTitle>
+                <CardTitle>Order Management</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Complete supplier directory will be displayed here.
-                </p>
+                <OrdersManagement />
               </CardContent>
             </Card>
           </TabsContent>
@@ -129,9 +148,29 @@ const AdminDashboard = () => {
                 <CardTitle>User Management</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Complete user directory and role management will be displayed here.
-                </p>
+                <UserManagement />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="suppliers">
+            <Card>
+              <CardHeader>
+                <CardTitle>Suppliers Directory</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SuppliersManagement />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="kyc">
+            <Card>
+              <CardHeader>
+                <CardTitle>KYC Approval Requests</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <KYCApprovals />
               </CardContent>
             </Card>
           </TabsContent>
