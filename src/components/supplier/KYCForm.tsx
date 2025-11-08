@@ -7,12 +7,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Upload, FileCheck, Loader2 } from "lucide-react";
 
 const kycSchema = z.object({
   businessName: z.string().min(2, "Business name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Phone number must be at least 10 characters"),
+  address: z.string().min(5, "Address must be at least 5 characters"),
+  contactPerson: z.string().min(2, "Contact person name must be at least 2 characters"),
   idDocument: z.any(),
   businessCertificate: z.any(),
 });
@@ -71,6 +76,10 @@ export function KYCForm({ onSuccess }: { onSuccess?: () => void }) {
         .insert({
           user_id: user.id,
           business_name: data.businessName,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          contact_person: data.contactPerson,
           id_document_url: idDocUrl,
           business_certificate_url: businessCertUrl,
           kyc_status: "pending",
@@ -106,6 +115,58 @@ export function KYCForm({ onSuccess }: { onSuccess?: () => void }) {
             />
             {errors.businessName && (
               <p className="text-sm text-destructive">{errors.businessName.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contactPerson">Contact Person</Label>
+            <Input
+              id="contactPerson"
+              {...register("contactPerson")}
+              placeholder="Full name of contact person"
+            />
+            {errors.contactPerson && (
+              <p className="text-sm text-destructive">{errors.contactPerson.message}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Business Email</Label>
+              <Input
+                id="email"
+                type="email"
+                {...register("email")}
+                placeholder="business@example.com"
+              />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                {...register("phone")}
+                placeholder="+254 712 345 678"
+              />
+              {errors.phone && (
+                <p className="text-sm text-destructive">{errors.phone.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="address">Business Address</Label>
+            <Textarea
+              id="address"
+              {...register("address")}
+              placeholder="Enter full business address"
+              rows={3}
+            />
+            {errors.address && (
+              <p className="text-sm text-destructive">{errors.address.message}</p>
             )}
           </div>
 

@@ -10,6 +10,7 @@ import { KYCForm } from "@/components/supplier/KYCForm";
 import { ProductForm } from "@/components/supplier/ProductForm";
 import { ProductsTable } from "@/components/supplier/ProductsTable";
 import { SalesChart } from "@/components/supplier/SalesChart";
+import { SupplierOrders } from "@/components/supplier/SupplierOrders";
 
 const SupplierDashboard = () => {
   const { signOut, user } = useAuth();
@@ -191,6 +192,10 @@ const SupplierDashboard = () => {
 
         <div className="mb-8">
           <SalesChart orders={orders} />
+        </div>
+
+        <div className="mb-8">
+          <SupplierOrders supplierId={supplier.id} />
         </div>
 
         <Card>

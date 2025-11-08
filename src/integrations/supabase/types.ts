@@ -191,34 +191,46 @@ export type Database = {
       }
       suppliers: {
         Row: {
+          address: string | null
           business_certificate_url: string | null
           business_name: string
+          contact_person: string | null
           created_at: string
+          email: string | null
           id: string
           id_document_url: string | null
           kyc_status: string
+          phone: string | null
           rejection_reason: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          address?: string | null
           business_certificate_url?: string | null
           business_name: string
+          contact_person?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           id_document_url?: string | null
           kyc_status?: string
+          phone?: string | null
           rejection_reason?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          address?: string | null
           business_certificate_url?: string | null
           business_name?: string
+          contact_person?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           id_document_url?: string | null
           kyc_status?: string
+          phone?: string | null
           rejection_reason?: string | null
           updated_at?: string
           user_id?: string
