@@ -37,6 +37,48 @@ serve(async (req) => {
       throw new Error("Invalid request data");
     }
 
+    // Verify UUID format for orderId
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(orderId)) {
+      throw new Error("Invalid order ID format");
+    }
+
+    // Validate items array
+    if (items.length > 100) {
+      throw new Error("Too many items in order");
+    }
+
+    for (const item of items) {
+      if (!item.name || typeof item.name !== 'string' || item.name.length > 200) {
+        throw new Error("Invalid item name");
+      }
+      if (typeof item.price !== 'number' || item.price <= 0) {
+        throw new Error("Invalid item price");
+      }
+      if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
+        throw new Error("Invalid item quantity");
+      }
+    }
+
+    // Verify order ownership - user must own this order
+    const { data: orderData, error: orderError } = await supabaseClient
+      .from("orders")
+      .select("customer_id, status")
+      .eq("id", orderId)
+      .single();
+
+    if (orderError || !orderData) {
+      throw new Error("Order not found");
+    }
+
+    if (orderData.customer_id !== user.id) {
+      throw new Error("Unauthorized: You don't own this order");
+    }
+
+    if (orderData.status !== "pending") {
+      throw new Error("Order cannot be processed - invalid status");
+    }
+
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",

@@ -36,6 +36,36 @@ serve(async (req) => {
       throw new Error("Missing session ID or order ID");
     }
 
+    // Validate session ID format (Stripe checkout sessions start with cs_)
+    if (!sessionId.startsWith('cs_')) {
+      throw new Error("Invalid session ID format");
+    }
+
+    // Validate UUID format for orderId
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(orderId)) {
+      throw new Error("Invalid order ID format");
+    }
+
+    // Verify order ownership and payment intent
+    const { data: orderData, error: orderError } = await supabaseClient
+      .from("orders")
+      .select("customer_id, payment_intent_id")
+      .eq("id", orderId)
+      .single();
+
+    if (orderError || !orderData) {
+      throw new Error("Order not found");
+    }
+
+    if (orderData.customer_id !== user.id) {
+      throw new Error("Unauthorized: You don't own this order");
+    }
+
+    if (orderData.payment_intent_id !== sessionId) {
+      throw new Error("Session ID doesn't match order");
+    }
+
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
