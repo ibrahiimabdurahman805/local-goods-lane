@@ -43,11 +43,13 @@ export default function Auth() {
     e.preventDefault();
     setIsLoading(true);
 
+    // Security: Always default new signups to 'customer' role
+    // Admin and supplier roles must be assigned by administrators
     const { error } = await signUp(
       signupData.email,
       signupData.password,
       signupData.fullName,
-      signupData.role
+      'customer'
     );
 
     if (error) {
@@ -122,6 +124,8 @@ export default function Auth() {
                     value={signupData.fullName}
                     onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
                     required
+                    minLength={2}
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -133,6 +137,7 @@ export default function Auth() {
                     value={signupData.email}
                     onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
                     required
+                    maxLength={255}
                   />
                 </div>
                 <div className="space-y-2">
@@ -144,24 +149,11 @@ export default function Auth() {
                     value={signupData.password}
                     onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                     required
-                    minLength={6}
+                    minLength={8}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-role">Account Type</Label>
-                  <Select
-                    value={signupData.role}
-                    onValueChange={(value: any) => setSignupData({ ...signupData, role: value })}
-                  >
-                    <SelectTrigger id="signup-role">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="customer">Customer</SelectItem>
-                      <SelectItem value="supplier">Supplier</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Minimum 8 characters required
+                  </p>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (

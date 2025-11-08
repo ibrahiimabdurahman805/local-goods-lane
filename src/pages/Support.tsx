@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { AppNav } from "@/components/layout/AppNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   HelpCircle,
   Mail,
@@ -24,21 +26,43 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const Support = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const { toast } = useToast();
+const contactSchema = z.object({
+  name: z.string()
+    .trim()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .max(100, { message: "Name must be less than 100 characters" }),
+  email: z.string()
+    .trim()
+    .email({ message: "Invalid email address" })
+    .max(255, { message: "Email must be less than 255 characters" }),
+  message: z.string()
+    .trim()
+    .min(10, { message: "Message must be at least 10 characters" })
+    .max(2000, { message: "Message must be less than 2000 characters" }),
+});
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+type ContactFormData = z.infer<typeof contactSchema>;
+
+const Support = () => {
+  const { toast } = useToast();
+  
+  const form = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
+  });
+
+  const handleSubmit = (data: ContactFormData) => {
+    // Here you would typically send the validated data to your backend
+    console.log("Validated contact form data:", data);
     toast({
       title: "Message Sent!",
       description: "Our support team will get back to you within 24 hours.",
     });
-    setName("");
-    setEmail("");
-    setMessage("");
+    form.reset();
   };
 
   const faqs = [
@@ -190,38 +214,41 @@ const Support = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
                   <div>
                     <Label htmlFor="name">Name</Label>
                     <Input
                       id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
                       placeholder="Your full name"
-                      required
+                      {...form.register("name")}
                     />
+                    {form.formState.errors.name && (
+                      <p className="text-sm text-destructive mt-1">{form.formState.errors.name.message}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
                       placeholder="your.email@example.com"
-                      required
+                      {...form.register("email")}
                     />
+                    {form.formState.errors.email && (
+                      <p className="text-sm text-destructive mt-1">{form.formState.errors.email.message}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="message">Message</Label>
                     <Textarea
                       id="message"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
                       placeholder="Describe your issue or question..."
                       rows={5}
-                      required
+                      {...form.register("message")}
                     />
+                    {form.formState.errors.message && (
+                      <p className="text-sm text-destructive mt-1">{form.formState.errors.message.message}</p>
+                    )}
                   </div>
                   <Button type="submit" className="w-full gradient-primary text-white shadow-glow hover-scale">
                     <Send className="h-4 w-4 mr-2" />
