@@ -6,10 +6,11 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Product } from "@/types/entities";
 
 const Products = () => {
-  const [products, setProducts] = useState<any[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
@@ -19,8 +20,31 @@ const Products = () => {
   }, []);
 
   useEffect(() => {
-    filterProducts();
-  }, [searchQuery, selectedCategory, products]);
+    if (!products.length && searchQuery === "" && selectedCategory === "All") {
+      setFilteredProducts(products);
+      return;
+    }
+
+    let filtered = [...products];
+
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter(
+        (p) => p.category?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(lowerQuery) ||
+          p.category?.toLowerCase().includes(lowerQuery) ||
+          p.description?.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    setFilteredProducts(filtered);
+  }, [products, searchQuery, selectedCategory]);
 
   const fetchProducts = async () => {
     try {
@@ -31,8 +55,8 @@ const Products = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setProducts(data || []);
-      setFilteredProducts(data || []);
+      setProducts(data ?? []);
+      setFilteredProducts(data ?? []);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -40,31 +64,17 @@ const Products = () => {
     }
   };
 
-  const filterProducts = () => {
-    let filtered = products;
-
-    // Filter by category
-    if (selectedCategory !== "All") {
-      filtered = filtered.filter(
-        (p) => p.category?.toLowerCase() === selectedCategory.toLowerCase()
-      );
-    }
-
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    setFilteredProducts(filtered);
-  };
-
   // Get unique categories from products
-  const categories = ["All", ...Array.from(new Set(products.map((p) => p.category).filter(Boolean)))];
+  const categories = [
+    "All",
+    ...Array.from(
+      new Set(
+        products
+          .map((p) => p.category)
+          .filter((category): category is string => Boolean(category))
+      )
+    ),
+  ];
 
   return (
     <div className="min-h-screen bg-background">

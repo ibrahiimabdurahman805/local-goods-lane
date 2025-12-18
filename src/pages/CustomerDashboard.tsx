@@ -1,51 +1,57 @@
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Header } from '@/components/layout/Header';
-import { useAuth } from '@/hooks/useAuth';
-import { Package, User, ShoppingBag } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
-import { ProductBrowser } from '@/components/customer/ProductBrowser';
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Header } from "@/components/layout/Header";
+import { useAuth } from "@/hooks/useAuth";
+import { Package, User, ShoppingBag } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { ProductBrowser } from "@/components/customer/ProductBrowser";
+import type { OrderWithProduct } from "@/types/entities";
 
 export default function CustomerDashboard() {
   const { user } = useAuth();
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<OrderWithProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      fetchOrders();
+    if (!user) {
+      setOrders([]);
+      setLoading(false);
+      return;
     }
-  }, [user]);
 
-  const fetchOrders = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("orders")
-        .select(`
+    const fetchOrders = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("orders")
+          .select(
+            `
           *,
           products (
             name,
             image_url,
             price
           )
-        `)
-        .eq("customer_id", user.id)
-        .order("created_at", { ascending: false });
+        `
+          )
+          .eq("customer_id", user.id)
+          .order("created_at", { ascending: false })
+          .returns<OrderWithProduct[]>();
 
-      if (error) throw error;
-      setOrders(data || []);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (error) throw error;
+        setOrders(data ?? []);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const activeOrders = orders.filter(o => o.status === "pending");
-  const completedOrders = orders.filter(o => o.status === "completed");
+    void fetchOrders();
+  }, [user]);
+
+  const activeOrders = orders.filter((o) => o.status === "pending");
+  const completedOrders = orders.filter((o) => o.status === "completed");
 
   return (
     <div className="min-h-screen bg-background">

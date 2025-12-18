@@ -23,16 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ProductForm } from "./ProductForm";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  price: number;
-  stock: number;
-  category: string | null;
-  image_url: string | null;
-}
+import type { Product } from "@/types/entities";
 
 interface ProductsTableProps {
   products: Product[];

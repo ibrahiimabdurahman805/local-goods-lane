@@ -4,16 +4,16 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { AppNav } from "@/components/layout/AppNav";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import type { Product } from "@/types/entities";
 
 const Index = () => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
-  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -111,16 +111,25 @@ const Index = () => {
             </div>
 
             <div className="flex gap-4 justify-center flex-wrap animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
-              <Link to="/products">
-                <Button size="lg" className="text-lg px-8 bg-white text-primary hover:bg-white/90 shadow-elevated hover-scale">
+              <Button
+                size="lg"
+                className="text-lg px-8 bg-white text-primary hover:bg-white/90 shadow-elevated hover-scale"
+                asChild
+              >
+                <Link to="/auth?role=customer">
                   <ShoppingCart className="h-5 w-5 mr-2" />
-                  Start Shopping
-                </Button>
-              </Link>
-              <Button size="lg" variant="outline" className="text-lg px-8 bg-transparent border-white hover:bg-white/10 text-white hover-scale" asChild>
-                <Link to="/auth">
+                  Sign in as Customer
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-8 bg-transparent border-white hover:bg-white/10 text-white hover-scale"
+                asChild
+              >
+                <Link to="/auth?role=supplier">
                   <Package className="h-5 w-5 mr-2" />
-                  Become a Supplier
+                  Sign in as Supplier
                 </Link>
               </Button>
             </div>

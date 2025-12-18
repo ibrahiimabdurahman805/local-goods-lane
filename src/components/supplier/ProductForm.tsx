@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2, Upload } from "lucide-react";
+import type { Product } from "@/types/entities";
 
 const productSchema = z.object({
   name: z.string().min(2, "Product name must be at least 2 characters").max(100),
@@ -22,7 +23,7 @@ type ProductFormData = z.infer<typeof productSchema>;
 
 interface ProductFormProps {
   supplierId: string;
-  product?: any;
+  product?: Product;
   onSuccess?: () => void;
   onCancel?: () => void;
 }

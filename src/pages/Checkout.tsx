@@ -74,7 +74,7 @@ export default function Checkout() {
       if (orderError) throw orderError;
 
       // Create order items
-      const orderItems = items.map(item => ({
+      const orderItems = items.map((item) => ({
         order_id: order.id,
         product_id: item.id,
         quantity: item.quantity,
@@ -93,7 +93,7 @@ export default function Checkout() {
         {
           body: {
             orderId: order.id,
-            items: items.map(item => ({
+            items: items.map((item) => ({
               name: item.name,
               price: item.price,
               quantity: item.quantity,
@@ -111,9 +111,10 @@ export default function Checkout() {
         clearCart();
         navigate("/payment-processing", { state: { orderId: order.id } });
       }
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to process checkout";
       console.error("Checkout error:", error);
-      toast.error(error.message || "Failed to process checkout");
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }

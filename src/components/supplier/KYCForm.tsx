@@ -14,10 +14,14 @@ import { Upload, FileCheck, Loader2 } from "lucide-react";
 
 const kycSchema = z.object({
   businessName: z.string().min(2, "Business name must be at least 2 characters"),
+  storeName: z.string().min(2, "Store name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 characters"),
   address: z.string().min(5, "Address must be at least 5 characters"),
   contactPerson: z.string().min(2, "Contact person name must be at least 2 characters"),
+  facebookHandle: z.string().optional(),
+  tiktokHandle: z.string().optional(),
+  instagramHandle: z.string().optional(),
   idDocument: z.any(),
   businessCertificate: z.any(),
 });
@@ -76,10 +80,14 @@ export function KYCForm({ onSuccess }: { onSuccess?: () => void }) {
         .insert({
           user_id: user.id,
           business_name: data.businessName,
+          store_name: data.storeName,
           email: data.email,
           phone: data.phone,
           address: data.address,
           contact_person: data.contactPerson,
+          facebook_handle: data.facebookHandle || null,
+          tiktok_handle: data.tiktokHandle || null,
+          instagram_handle: data.instagramHandle || null,
           id_document_url: idDocUrl,
           business_certificate_url: businessCertUrl,
           kyc_status: "pending",
@@ -89,8 +97,9 @@ export function KYCForm({ onSuccess }: { onSuccess?: () => void }) {
 
       toast.success("KYC documents submitted for review!");
       onSuccess?.();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to submit KYC documents");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to submit KYC documents";
+      toast.error(message);
     } finally {
       setUploading(false);
     }
@@ -115,6 +124,18 @@ export function KYCForm({ onSuccess }: { onSuccess?: () => void }) {
             />
             {errors.businessName && (
               <p className="text-sm text-destructive">{errors.businessName.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="storeName">Store / Shop Name</Label>
+            <Input
+              id="storeName"
+              {...register("storeName")}
+              placeholder="Name customers see on your storefront"
+            />
+            {errors.storeName && (
+              <p className="text-sm text-destructive">{errors.storeName.message}</p>
             )}
           </div>
 
@@ -168,6 +189,33 @@ export function KYCForm({ onSuccess }: { onSuccess?: () => void }) {
             {errors.address && (
               <p className="text-sm text-destructive">{errors.address.message}</p>
             )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="facebookHandle">Facebook Page</Label>
+              <Input
+                id="facebookHandle"
+                {...register("facebookHandle")}
+                placeholder="@yourstore"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tiktokHandle">TikTok Handle</Label>
+              <Input
+                id="tiktokHandle"
+                {...register("tiktokHandle")}
+                placeholder="@yourstore"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="instagramHandle">Instagram Handle</Label>
+              <Input
+                id="instagramHandle"
+                {...register("instagramHandle")}
+                placeholder="@yourstore"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

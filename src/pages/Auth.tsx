@@ -1,27 +1,68 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
+  const [searchParams] = useSearchParams();
+  const preselectedRole = searchParams.get('role') === 'supplier' ? 'supplier' : 'customer';
+  
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [signupData, setSignupData] = useState({
     email: '',
     password: '',
     fullName: '',
-    role: 'customer' as 'admin' | 'supplier' | 'customer'
+    role: preselectedRole as 'admin' | 'supplier' | 'customer',
+    storeName: '',
+    facebookHandle: '',
+    tiktokHandle: '',
+    instagramHandle: ''
   });
+
+  const redirectToDashboard = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        navigate('/');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      const role = data?.role || 'customer';
+
+      if (role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (role === 'supplier') {
+        navigate('/supplier/dashboard', { replace: true });
+      } else {
+        navigate('/customer/dashboard', { replace: true });
+      }
+    } catch (error) {
+      console.error('Failed to redirect after auth', error);
+      navigate('/', { replace: true });
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +74,7 @@ export default function Auth() {
       toast.error(error.message || 'Failed to sign in');
     } else {
       toast.success('Signed in successfully');
-      navigate('/');
+      await redirectToDashboard();
     }
 
     setIsLoading(false);
@@ -49,14 +90,17 @@ export default function Auth() {
       signupData.email,
       signupData.password,
       signupData.fullName,
-      'customer'
+      signupData.role === 'supplier' ? 'supplier' : 'customer'
     );
 
     if (error) {
       toast.error(error.message || 'Failed to sign up');
     } else {
       toast.success('Account created successfully');
-      navigate('/');
+      if (signupData.role === 'supplier') {
+        toast.info('Complete your supplier profile in the dashboard to start selling.');
+      }
+      await redirectToDashboard();
     }
 
     setIsLoading(false);
@@ -154,6 +198,53 @@ export default function Auth() {
                   <p className="text-xs text-muted-foreground">
                     Minimum 8 characters required
                   </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-store">Store / Shop Name</Label>
+                  <Input
+                    id="signup-store"
+                    type="text"
+                    placeholder="Local Goods Lane Shop"
+                    value={signupData.storeName}
+                    onChange={(e) => setSignupData({ ...signupData, storeName: e.target.value })}
+                    minLength={2}
+                    maxLength={100}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Optional but recommended for suppliers so buyers recognize you.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-facebook">Facebook Page</Label>
+                    <Input
+                      id="signup-facebook"
+                      placeholder="@yourstore"
+                      value={signupData.facebookHandle}
+                      onChange={(e) => setSignupData({ ...signupData, facebookHandle: e.target.value })}
+                      maxLength={100}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-tiktok">TikTok Handle</Label>
+                    <Input
+                      id="signup-tiktok"
+                      placeholder="@yourstore"
+                      value={signupData.tiktokHandle}
+                      onChange={(e) => setSignupData({ ...signupData, tiktokHandle: e.target.value })}
+                      maxLength={100}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-instagram">Instagram Handle</Label>
+                    <Input
+                      id="signup-instagram"
+                      placeholder="@yourstore"
+                      value={signupData.instagramHandle}
+                      onChange={(e) => setSignupData({ ...signupData, instagramHandle: e.target.value })}
+                      maxLength={100}
+                    />
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (

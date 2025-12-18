@@ -1,11 +1,12 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { toast } from "sonner";
+import type { Product } from "@/types/entities";
 
 interface CartItem {
   id: string;
   name: string;
   price: number;
-  image_url: string;
+  image_url: string | null;
   quantity: number;
   stock: number;
   supplier_id: string;
@@ -13,7 +14,7 @@ interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: any) => void;
+  addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -26,7 +27,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  const addToCart = (product: any) => {
+  const addToCart = (product: Product) => {
     setItems((currentItems) => {
       const existingItem = currentItems.find((item) => item.id === product.id);
       

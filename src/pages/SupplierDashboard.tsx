@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { Package, Plus, TrendingUp, DollarSign, AlertCircle } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Package, Plus, TrendingUp, DollarSign, AlertCircle, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,67 +11,83 @@ import { ProductForm } from "@/components/supplier/ProductForm";
 import { ProductsTable } from "@/components/supplier/ProductsTable";
 import { SalesChart } from "@/components/supplier/SalesChart";
 import { SupplierOrders } from "@/components/supplier/SupplierOrders";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import type { Product, Supplier, Order } from "@/types/entities";
 
 const SupplierDashboard = () => {
   const { signOut, user } = useAuth();
-  const [supplier, setSupplier] = useState<any>(null);
-  const [products, setProducts] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [supplier, setSupplier] = useState<Supplier | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddProduct, setShowAddProduct] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      fetchSupplierData();
-    }
-  }, [user]);
-
-  const fetchSupplierData = async () => {
+  const fetchSupplierData = useCallback(async () => {
     if (!user) return;
 
     try {
-      // Fetch supplier data
       const { data: supplierData, error: supplierError } = await supabase
         .from("suppliers")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .maybeSingle<Supplier>();
 
       if (supplierError) throw supplierError;
       setSupplier(supplierData);
 
-      if (supplierData) {
-        // Fetch products
-        const { data: productsData, error: productsError } = await supabase
-          .from("products")
-          .select("*")
-          .eq("supplier_id", supplierData.id)
-          .order("created_at", { ascending: false });
-
-        if (productsError) throw productsError;
-        setProducts(productsData || []);
-
-        // Fetch orders for sales chart
-        const { data: ordersData, error: ordersError } = await supabase
-          .from("orders")
-          .select("*")
-          .in(
-            "product_id",
-            productsData?.map((p) => p.id) || []
-          )
-          .eq("status", "completed");
-
-        if (ordersError) throw ordersError;
-        setOrders(ordersData || []);
+      if (!supplierData) {
+        setProducts([]);
+        setOrders([]);
+        return;
       }
+
+      const { data: productsData, error: productsError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("supplier_id", supplierData.id)
+        .order("created_at", { ascending: false })
+        .returns<Product[]>();
+
+      if (productsError) throw productsError;
+      setProducts(productsData ?? []);
+
+      if (!productsData?.length) {
+        setOrders([]);
+        return;
+      }
+
+      const { data: ordersData, error: ordersError } = await supabase
+        .from("orders")
+        .select("*")
+        .in(
+          "product_id",
+          productsData.map((p) => p.id)
+        )
+        .eq("status", "completed")
+        .returns<Order[]>();
+
+      if (ordersError) throw ordersError;
+      setOrders(ordersData ?? []);
     } catch (error) {
       console.error("Error fetching supplier data:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const totalSales = orders.reduce((sum, order) => sum + Number(order.total_price), 0);
+  useEffect(() => {
+    if (user) {
+      void fetchSupplierData();
+    }
+  }, [user, fetchSupplierData]);
+
+  const totalSales = useMemo(
+    () => orders.reduce((sum, order) => sum + Number(order.total_price), 0),
+    [orders]
+  );
   const stats = [
     { title: "Total Products", value: products.length.toString(), icon: Package, color: "text-primary" },
     { title: "Total Sales", value: `KSh ${totalSales.toFixed(2)}`, icon: DollarSign, color: "text-secondary" },
@@ -161,7 +177,12 @@ const SupplierDashboard = () => {
       <header className="border-b bg-card shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Supplier Dashboard</h1>
+            <div>
+              <p className="text-sm text-muted-foreground">Welcome back</p>
+              <h1 className="text-2xl font-bold">
+                {supplier.store_name || supplier.business_name || "Supplier Dashboard"}
+              </h1>
+            </div>
             <div className="flex gap-2">
               <Button onClick={() => setShowAddProduct(true)}>
                 <Plus className="mr-2 h-4 w-4" />

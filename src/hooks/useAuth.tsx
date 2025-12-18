@@ -1,17 +1,17 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useContext, useEffect, useState } from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
-type UserRole = 'admin' | 'supplier' | 'customer';
+type UserRole = "admin" | "supplier" | "customer";
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   userRole: UserRole | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role?: UserRole) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role?: UserRole) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -59,22 +59,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUserRole = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
         .single();
 
       if (error) throw error;
       setUserRole(data.role as UserRole);
     } catch (error) {
-      console.error('Error fetching user role:', error);
-      setUserRole('customer'); // Default to customer
+      console.error("Error fetching user role:", error);
+      setUserRole("customer"); // Default to customer
     } finally {
       setLoading(false);
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, role: UserRole = 'customer') => {
+  const signUp = async (email: string, password: string, fullName: string, role: UserRole = "customer") => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -91,19 +91,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) return { error };
 
-      // If role is not customer, update the role
-      if (data.user && role !== 'customer') {
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .update({ role })
-          .eq('user_id', data.user.id);
+      const newUserId = data.user?.id;
 
-        if (roleError) console.error('Error updating role:', roleError);
+      // If role is not customer, set/override the role row
+      if (newUserId && role && role !== "customer") {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .upsert({ user_id: newUserId, role }, { onConflict: "user_id" });
+
+        if (roleError) console.error("Error updating role:", roleError);
       }
 
       return { error: null };
-    } catch (error: any) {
-      return { error };
+    } catch (error) {
+      return { error: error instanceof Error ? error : new Error("Failed to sign up") };
     }
   };
 
@@ -115,14 +116,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       return { error };
-    } catch (error: any) {
-      return { error };
+    } catch (error) {
+      return { error: error instanceof Error ? error : new Error("Failed to sign in") };
     }
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    navigate('/auth');
+    navigate("/auth");
   };
 
   return (
@@ -135,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

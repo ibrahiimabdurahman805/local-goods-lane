@@ -6,12 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle, Loader2, Package } from "lucide-react";
 import { toast } from "sonner";
+import type { OrderWithItems } from "@/types/entities";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(true);
-  const [orderDetails, setOrderDetails] = useState<any>(null);
+  const [orderDetails, setOrderDetails] = useState<OrderWithItems | null>(null);
 
   const sessionId = searchParams.get("session_id");
   const orderId = searchParams.get("order_id");
@@ -36,16 +37,18 @@ export default function PaymentSuccess() {
           // Fetch order details
           const { data: order, error: orderError } = await supabase
             .from("orders")
-            .select(`
+            .select(
+              `
               *,
               order_items (
                 quantity,
                 price,
                 products (name, image_url)
               )
-            `)
+            `
+            )
             .eq("id", orderId)
-            .single();
+            .single<OrderWithItems>();
 
           if (orderError) throw orderError;
 
@@ -54,9 +57,10 @@ export default function PaymentSuccess() {
         } else {
           toast.error("Payment verification failed");
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error("Verification error:", error);
-        toast.error("Failed to verify payment");
+        const message = error instanceof Error ? error.message : "Failed to verify payment";
+        toast.error(message);
       } finally {
         setIsVerifying(false);
       }
@@ -155,7 +159,7 @@ export default function PaymentSuccess() {
             <div className="border-t pt-4">
               <h3 className="font-semibold mb-3">Items Ordered</h3>
               <div className="space-y-2">
-                {orderDetails.order_items?.map((item: any, index: number) => (
+                {orderDetails.order_items?.map((item, index) => (
                   <div key={index} className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
                       {item.products?.name} x {item.quantity}

@@ -4,17 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/useCart";
+import type { Product } from "@/types/entities";
 
 interface ProductCardProps {
-  product: {
-    id: string;
-    name: string;
-    price: number;
-    image_url?: string;
-    category?: string;
-    stock: number;
-    supplier_id?: string;
-  };
+  product: Product;
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {

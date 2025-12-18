@@ -8,43 +8,54 @@ import { Header } from "@/components/layout/Header";
 import { useCart } from "@/hooks/useCart";
 import { ArrowLeft, ShoppingCart, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import type { Product } from "@/types/entities";
+
+type SupplierInfo = Pick<Product, "supplier_id"> & {
+  business_name: string;
+};
 
 export default function ProductDetail() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const { addToCart } = useCart();
-  const [product, setProduct] = useState<any>(null);
-  const [supplier, setSupplier] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [supplier, setSupplier] = useState<SupplierInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProductDetails();
-  }, [id]);
-
-  const fetchProductDetails = async () => {
-    try {
-      const { data: productData, error: productError } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (productError) throw productError;
-      setProduct(productData);
-
-      const { data: supplierData } = await supabase
-        .from("suppliers")
-        .select("business_name")
-        .eq("id", productData.supplier_id)
-        .single();
-
-      setSupplier(supplierData);
-    } catch (error) {
-      console.error("Error fetching product:", error);
-      toast.error("Failed to load product details");
-    } finally {
+    if (!id) {
       setLoading(false);
+      return;
     }
-  };
+
+    const fetchProductDetails = async () => {
+      try {
+        const { data: productData, error: productError } = await supabase
+          .from("products")
+          .select("*")
+          .eq("id", id)
+          .single<Product>();
+
+        if (productError) throw productError;
+        setProduct(productData);
+
+        const { data: supplierData, error: supplierError } = await supabase
+          .from("suppliers")
+          .select("business_name, id")
+          .eq("id", productData.supplier_id)
+          .single<SupplierInfo>();
+
+        if (supplierError) throw supplierError;
+        setSupplier(supplierData);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        toast.error("Failed to load product details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchProductDetails();
+  }, [id]);
 
   if (loading) {
     return (
